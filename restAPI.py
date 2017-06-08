@@ -1,0 +1,46 @@
+#!flask/bin/python
+from flask import Flask, request, jsonify
+from flask import render_template
+import os
+import json
+from webob import Response
+import aes_ocb
+import sys
+
+app = Flask('ocb_app')
+
+AES = aes_ocb.AES_cipher()
+
+
+@app.route('/api/ocb/encrypt', methods=['POST'])
+def ocb_encryption():
+    # Encryption the plaintext
+    json_dict = request.get_json()
+    plaintext = str(json_dict['plaintext'])
+    header = str(json_dict['header'])
+    tag, ciphertext = AES.Encrypt(plaintext, header)
+    # Ttansform the ciphertext from bytearray to string
+    content = {"tag": "", "ciphertext": ""}
+    for i in range(len(ciphertext)):
+        content['ciphertext'] += hex(ciphertext[i])[2:].zfill(2)
+    for i in range(len(tag)):
+        content['tag'] += hex(tag[i])[2:].zfill(2)
+    body = json.dumps(content)
+    return Response(content_type='application/json', body=body)
+
+@app.route('/api/ocb/decrypt', methods=['POST'])
+def ocb_decryption():
+    # Encryption the plaintext
+    json_dict = request.get_json()
+    ciphertext = bytearray.fromhex(str(json_dict['ciphertext']))
+    header = str(json_dict['header'])
+    tag = bytearray.fromhex(str(json_dict['tag']))
+    is_authentic, plaintext = AES.Decrypt(ciphertext, header, tag)
+
+    # Ttansform the ciphertext from bytearray to string
+    content = {"is_authentic": is_authentic, "plaintext": plaintext}
+    body = json.dumps(content)
+    return Response(content_type='application/json', body=body)
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', threaded=True)
