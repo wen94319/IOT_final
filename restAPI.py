@@ -6,11 +6,16 @@ import json
 from webob import Response
 import aes_ocb
 import sys
+from flask_cors import CORS
 
 app = Flask('ocb_app')
+CORS(app)
 
 AES = aes_ocb.AES_cipher()
 
+@app.route('/', methods=['GET'])
+def indexInfo():
+    return render_template('webname.html')
 
 @app.route('/api/ocb/encrypt', methods=['POST'])
 def ocb_encryption():
@@ -28,6 +33,7 @@ def ocb_encryption():
     body = json.dumps(content)
     return Response(content_type='application/json', body=body)
 
+
 @app.route('/api/ocb/decrypt', methods=['POST'])
 def ocb_decryption():
     # Encryption the plaintext
@@ -41,6 +47,7 @@ def ocb_decryption():
     content = {"is_authentic": is_authentic, "plaintext": plaintext}
     body = json.dumps(content)
     return Response(content_type='application/json', body=body)
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', threaded=True)
