@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!--Import Google Icon Font-->
+  <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!--Import materialize.css-->
+  <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+  <!--Import jQuery before materialize.js-->
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.6.1/clipboard.min.js"></script>
+  <!--Let browser know website is optimized for mobile-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+
+  <nav>
+    <div class="nav-wrapper">
+      <a href="#!" class="brand-logo"><i class="material-icons">lock</i>OCB Encription</a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="index.html"><i class="material-icons">search</i></a></li>
+        <li><a href="decript.html"><i class="material-icons">view_module</i></a></li>
+        <!-- <li><a href=""><i class="material-icons">refresh</i></a></li>
+        <li><a href=""><i class="material-icons">more_vert</i></a></li> -->
+      </ul>
+    </div>
+  </nav>
+
+  <div id="encription_result" class="row" style="position:absolute;margin:auto;top:40%;right:0; bottom:0;left:0;display:none;">
+    <form class="col s12">
+      <div class="row">
+        <!-- <div class="input-field col s12">
+          <textarea id="textarea1" value="weqj;jasdkl;gs;sagio;"class="materialize-textarea" style="font-size:50px;" readOnly="True">
+            weqj;jasdkl;gs;sagio;
+          </textarea>
+          <label for="textarea1">This is your encription!!</label>
+        </div> -->
+        <div class="input-field col s6" style="margin-left:30%;">
+          <input id="textarea1" value="" type="text" class="validate" style="font-size:50px;" readOnly="True">
+          <label for="textarea1">This is your encription!!</label>
+        </div>
+        <div class="input-field col s6" style="margin-left:30%;">
+          <input id="textarea2" value="" type="text" class="validate" style="font-size:50px;" readOnly="True">
+          <label for="textarea2">This is your tag!!</label>
+        </div>
+      </div>
+    </form>
+    <!-- Trigger -->
+    <button class="btn" data-clipboard-target="#textarea1" style="margin-left:45%;">
+      Copy!!
+    </button>
+  </div>
+  <div id="form" class="row" style="position:absolute;margin:auto;top:40%;right:0; bottom:0;left:30%;">
+    <form class="col s12">
+      <div class="row">
+        <div class="input-field col s6">
+          <i class="material-icons prefix">person_pin</i>
+          <input id="header" type="text" class="validate">
+          <label for="header">Your Header</label>
+        </div>
+      </div>
+    </form>
+    <form class="col s12">
+      <div class="row">
+        <div class="input-field col s6">
+          <i class="material-icons prefix">comment</i>
+          <input id="Encript" type="text" class="validate">
+          <label for="Encript">The Text You Wanna Encript!</label>
+        </div>
+      </div>
+    </form>
+  </div>
+
+
+  <button id="submit" class="btn waves-effect waves-light" type="submit" name="action" style="position:absolute;margin:auto;top:50%;right:0; bottom:0;left:43%;">
+    Encript!
+    <i class="material-icons right">send</i>
+  </button>
+  <script>
+    $(document).ready(function() {
+      console.log("!!!!");
+      var btns = document.querySelectorAll('button');
+      var clipboard = new Clipboard(btns);
+      clipboard.on('success', function(e) {
+        var $toastContent = $('<span>Copied!!</span>');
+        Materialize.toast($toastContent, 5000);
+        console.log(e);
+      });
+      clipboard.on('error', function(e) {
+        console.log(e);
+      });
+      document.getElementById('submit').addEventListener('click', function() {
+        //document.location.href="http://localhost:8000/show_encript.html";
+        /*
+
+
+        http://140.114.253.36:5000/api/ocb/encrypt
+{
+	"plaintext":"you are 87.",
+	"header":"555555"
+}
+
+        */
+        var postdata = {};
+
+        var header = (document.getElementById('header').value);
+        var plaintext = (document.getElementById('Encript').value);
+        console.log(header);
+        console.log(plaintext);
+
+        postdata = {
+          'plaintext': plaintext,
+          'header': header
+        };
+        console.log(JSON.stringify(postdata));
+        $.ajax({
+          url: "http://140.114.253.36:5000/api/ocb/encrypt",
+          type: "POST",
+          data: JSON.stringify(postdata),
+          contentType: "application/json;",
+          dataType: "json",
+          success: function(data) {
+            document.getElementById('textarea1').value = data['ciphertext'];
+            document.getElementById('textarea2').value = data['tag'];
+
+          }
+        });
+
+        document.getElementById('form').style.display = "none";
+        document.getElementById('submit').style.display = "none";
+
+        document.getElementById('encription_result').style.display = "block";
+
+      });
+      $("#textarea1").on("click", function() {
+        var words = $(this).select();
+        var ciphertext = words[0].value.trim()
+        console.log(words[0].value.trim());
+        //
+        var copied = document.execCommand('copy');
+        // console.log(copied);
+        var $toastContent = $('<span>Copied!!</span>');
+        Materialize.toast($toastContent, 5000);
+      });
+    });
+  </script>
+</body>
+
+</html>
