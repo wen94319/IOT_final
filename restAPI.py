@@ -10,12 +10,13 @@ from flask_cors import CORS
 
 app = Flask('ocb_app')
 CORS(app)
-
 AES = aes_ocb.AES_cipher()
+
 
 @app.route('/', methods=['GET'])
 def indexInfo():
     return render_template('webname.html')
+
 
 @app.route('/api/ocb/encrypt', methods=['POST'])
 def ocb_encryption():
@@ -23,7 +24,9 @@ def ocb_encryption():
     json_dict = request.get_json()
     plaintext = str(json_dict['plaintext'])
     header = str(json_dict['header'])
+
     tag, ciphertext = AES.Encrypt(plaintext, header)
+
     # Ttansform the ciphertext from bytearray to string
     content = {"tag": "", "ciphertext": ""}
     for i in range(len(ciphertext)):
@@ -41,6 +44,7 @@ def ocb_decryption():
     ciphertext = bytearray.fromhex(str(json_dict['ciphertext']))
     header = str(json_dict['header'])
     tag = bytearray.fromhex(str(json_dict['tag']))
+
     is_authentic, plaintext = AES.Decrypt(ciphertext, header, tag)
 
     # Ttansform the ciphertext from bytearray to string
