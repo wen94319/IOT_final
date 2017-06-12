@@ -61,11 +61,19 @@ def ocb_decryption():
     return Response(content_type='application/json', body=body)
 
 
-@app.route('/api/ocb/decrypt', methods=['GET'])
-def get_ocb_decryption():
-    content = {"is_authentic": True, "plaintext": "I'm plaintext"}
-    body = json.dumps(content)
-    return Response(content_type='application/json', body=body)
+@app.route('/api/ocb/setkey', methods=['POST'])
+def set_key():
+    json_dict = request.get_json()
+    key = bytearray().fromhex(str(json_dict['key']))
+    AES.ocb.setKey(key)
+    return Response(content_type='application/json', body="success")
+
+@app.route('/api/ocb/setnonce', methods=['POST'])
+def set_nonce():
+    json_dict = request.get_json()
+    nonce = bytearray().fromhex(str(json_dict['nonce']))
+    AES.ocb.nonce = nonce
+    return Response(content_type='application/json', body="success")
 
 
 @app.route('/api/ocb/testcase_Encrypt', methods=['GET'])
