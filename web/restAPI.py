@@ -16,13 +16,14 @@ CORS(app)
 
 @app.route('/', methods=['GET'])
 @app.route('/index.html', methods=['GET'])
+@app.route('/encrypt.html', methods=['GET'])
 def indexInfo():
     return render_template('index.html')
 
 
-@app.route('/decript.html', methods=['GET'])
+@app.route('/decrypt.html', methods=['GET'])
 def decriptInfo():
-    return render_template('decript.html')
+    return render_template('decrypt.html')
 
 
 @app.route('/api/ocb/encrypt', methods=['POST'])
@@ -58,6 +59,20 @@ def ocb_decryption():
     content = {"is_authentic": is_authentic, "plaintext": plaintext}
     body = json.dumps(content)
     return Response(content_type='application/json', body=body)
+
+
+@app.route('/api/ocb/decrypt', methods=['GET'])
+def get_ocb_decryption():
+    content = {"is_authentic": True, "plaintext": "I'm plaintext"}
+    body = json.dumps(content)
+    return Response(content_type='application/json', body=body)
+
+
+@app.route('/api/ocb/testcase_Encrypt', methods=['GET'])
+def testcase_encryption():
+    # Encryption the plaintext
+    AES.testcase_Encrypt()
+    return Response(content_type='application/json', body="success")
 
 
 if __name__ == "__main__":
