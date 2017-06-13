@@ -36,11 +36,8 @@ def ocb_encryption():
     tag, ciphertext = AES.Encrypt(plaintext, header)
 
     # Ttansform the ciphertext from bytearray to string
-    content = {"tag": "", "ciphertext": ""}
-    for i in range(len(ciphertext)):
-        content['ciphertext'] += hex(ciphertext[i])[2:].zfill(2)
-    for i in range(len(tag)):
-        content['tag'] += hex(tag[i])[2:].zfill(2)
+    content = {"tag": tag.encode('hex'),
+               "ciphertext": ciphertext.encode('hex')}
     body = json.dumps(content)
     return Response(content_type='application/json', body=body)
 
@@ -68,6 +65,7 @@ def set_key():
     AES.ocb.setKey(key)
     return Response(content_type='application/json', body="success")
 
+
 @app.route('/api/ocb/setnonce', methods=['POST'])
 def set_nonce():
     json_dict = request.get_json()
@@ -80,6 +78,13 @@ def set_nonce():
 def testcase_encryption():
     # Encryption the plaintext
     AES.testcase_Encrypt()
+    return Response(content_type='application/json', body="success")
+
+
+@app.route('/api/ocb/testcase_Correctness', methods=['GET'])
+def encryption_correctness():
+    # Encryption the plaintext
+    AES.testcase_Correctness()
     return Response(content_type='application/json', body="success")
 
 
